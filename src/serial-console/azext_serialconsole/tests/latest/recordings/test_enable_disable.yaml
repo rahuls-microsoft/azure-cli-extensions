@@ -1,0 +1,102 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - serial-console disable
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - AZURECLI/2.61.0 azsdk-python-core/1.28.0 Python/3.10.12 (Linux-6.5.0-35-generic-x86_64-with-glibc2.35)
+    method: POST
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.SerialConsole/consoleServices/default/disableConsole?api-version=2018-05-01
+  response:
+    body:
+      string: "{\n \"properties\": {\n  \"disabled\": true\n }\n}"
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '42'
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Fri, 24 May 2024 21:02:49 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - deny
+      x-ms-ratelimit-remaining-subscription-writes:
+      - '1199'
+      x-msedge-ref:
+      - 'Ref A: A819640BF8B24147B0581814D8B0C3B4 Ref B: SJC211051204021 Ref C: 2024-05-24T21:02:48Z'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - serial-console enable
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - AZURECLI/2.61.0 azsdk-python-core/1.28.0 Python/3.10.12 (Linux-6.5.0-35-generic-x86_64-with-glibc2.35)
+    method: POST
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.SerialConsole/consoleServices/default/enableConsole?api-version=2018-05-01
+  response:
+    body:
+      string: "{\n \"properties\": {\n  \"disabled\": false\n }\n}"
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '43'
+      content-type:
+      - application/json; charset=UTF-8
+      date:
+      - Fri, 24 May 2024 21:02:50 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - deny
+      x-ms-ratelimit-remaining-subscription-writes:
+      - '1199'
+      x-msedge-ref:
+      - 'Ref A: 7FF58852ACCE4ED291941ADDB0AA625A Ref B: SJC211051205029 Ref C: 2024-05-24T21:02:49Z'
+    status:
+      code: 200
+      message: OK
+version: 1

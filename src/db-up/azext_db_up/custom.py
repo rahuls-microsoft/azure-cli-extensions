@@ -8,7 +8,7 @@ import os
 import re
 import sys
 import uuid
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import HttpResponseError
 from knack.log import get_logger
 from knack.util import CLIError
 import mysql.connector as mysql_connector
@@ -41,7 +41,7 @@ def mysql_up(cmd, client, resource_group_name=None, server_name=None, location=N
         server_result = _update_server(
             db_context, cmd, client, server_result, resource_group_name, server_name, backup_retention,
             geo_redundant_backup, storage_mb, administrator_login_password, version, ssl_enforcement, tags)
-    except CloudError:
+    except HttpResponseError:
         # Create mysql server
         if administrator_login_password is None:
             administrator_login_password = str(uuid.uuid4())
@@ -98,7 +98,7 @@ def postgres_up(cmd, client, resource_group_name=None, server_name=None, locatio
         server_result = _update_server(
             db_context, cmd, client, server_result, resource_group_name, server_name, backup_retention,
             geo_redundant_backup, storage_mb, administrator_login_password, version, ssl_enforcement, tags)
-    except CloudError:
+    except HttpResponseError:
         # Create postgresql server
         if administrator_login_password is None:
             administrator_login_password = str(uuid.uuid4())
@@ -156,7 +156,7 @@ def sql_up(cmd, client, resource_group_name=None, server_name=None, location=Non
         server_result = _update_sql_server(
             db_context, cmd, client, server_result, resource_group_name, server_name, administrator_login_password,
             version, tags)
-    except CloudError:
+    except HttpResponseError:
         # Create sql server
         if administrator_login_password is None:
             administrator_login_password = str(uuid.uuid4())
@@ -209,7 +209,7 @@ def _ensure_pymssql():
         python_path = os.environ.get('PYTHONPATH', '')
         os.environ['PYTHONPATH'] = python_path + ':' + db_up_ext_path if python_path else db_up_ext_path
         cmd = [sys.executable, '-m', 'pip', 'install', '--target', db_up_ext_path,
-               'pymssql==2.1.4', '-vv', '--disable-pip-version-check', '--no-cache-dir']
+               'pymssql==2.2.7', '-vv', '--disable-pip-version-check', '--no-cache-dir']
         logger.warning('  Installing "pymssql" pip packages')
         with HomebrewPipPatch():
             subprocess.check_output(cmd, stderr=subprocess.STDOUT)
@@ -224,7 +224,7 @@ def server_down(cmd, client, resource_group_name=None, server_name=None, delete_
 
         # delete resource group
         logger.warning('Deleting Resource Group \'%s\'...', resource_group_name)
-        return resource_client.resource_groups.delete(resource_group_name)
+        return resource_client.resource_groups.begin_delete(resource_group_name)
     logger.warning('Deleting server \'%s\'...', server_name)
     return client.delete(resource_group_name, server_name)
 
@@ -387,7 +387,7 @@ def _run_postgresql_commands(host, user, password, database):
         logger.warning("Ran Database Query: `CREATE USER root WITH ENCRYPTED PASSWORD '%s'`", db_password)
     except psycopg2.ProgrammingError:
         pass
-    cursor.execute("GRANT ALL PRIVILEGES ON DATABASE {} TO root".format(database))
+    cursor.execute('GRANT ALL PRIVILEGES ON DATABASE "{}" TO root'.format(database))
     logger.warning("Ran Database Query: `GRANT ALL PRIVILEGES ON DATABASE %s TO root`", database)
 
 
@@ -396,7 +396,7 @@ def _run_sql_commands(host, user, password, database):
     _ensure_pymssql()
     import pymssql
     with pymssql.connect(host, user, password, database, tds_version='7.0') as connection:
-        logger.warning('Successfully Connected to PostgreSQL.')
+        logger.warning('Successfully Connected to Azure SQL.')
         with connection.cursor() as cursor:
             try:
                 db_password = _create_db_password(database)
@@ -468,7 +468,7 @@ def _create_database(db_context, cmd, resource_group_name, server_name, database
     database_client = cf_db(cmd.cli_ctx, None)
     try:
         database_client.get(resource_group_name, server_name, database_name)
-    except CloudError:
+    except HttpResponseError:
         logger.warning('Creating %s database \'%s\'...', logging_name, database_name)
         resolve_poller(
             database_client.create_or_update(resource_group_name, server_name, database_name), cmd.cli_ctx,
@@ -480,7 +480,7 @@ def _create_sql_database(db_context, cmd, resource_group_name, server_name, data
     database_client = cf_db(cmd.cli_ctx, None)
     try:
         database_client.get(resource_group_name, server_name, database_name)
-    except CloudError:
+    except HttpResponseError:
         logger.warning('Creating %s database \'%s\'...', logging_name, database_name)
         params = azure_sdk.models.Database(location=location)
         resolve_poller(
@@ -616,7 +616,7 @@ def is_homebrew():
 
 # port from azure.cli.core.extension
 # A workaround for https://github.com/Azure/azure-cli/issues/4428
-class HomebrewPipPatch(object):  # pylint: disable=too-few-public-methods
+class HomebrewPipPatch(object):  # pylint: disable=too-few-public-methods, useless-object-inheritance
 
     CFG_FILE = os.path.expanduser(os.path.join('~', '.pydistutils.cfg'))
 
