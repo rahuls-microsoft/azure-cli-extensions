@@ -11,10 +11,6 @@ from setuptools import setup, find_packages
 
 # HISTORY.rst entry.
 VERSION = '1.0.0b1'
-try:
-    from azext_resource_mover.manual.version import VERSION
-except ImportError:
-    pass
 
 # The full list of classifiers is available at
 # https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -43,7 +39,7 @@ with open('HISTORY.rst', 'r', encoding='utf-8') as f:
     HISTORY = f.read()
 
 setup(
-    name='resource_mover',
+    name='resource-mover',
     version=VERSION,
     description='Microsoft Azure Command-Line Tools ResourceMoverServiceAPI Extension',
     author='Microsoft Corporation',
